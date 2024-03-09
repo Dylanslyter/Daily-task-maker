@@ -1,46 +1,91 @@
-// Retrieve tasks and nextId from localStorage
+let tasks = []
+function removeTaskByName(taskName) {
+  const index = tasks.findIndex(task => task.taskName === taskName);
+  if (index !== -1) {
+      tasks.splice(index, 1);
+      console.log(`Task ${taskName} removed successfully.`);
+  } else {
+      console.log(`Task ${taskName} not found.`);
+  }
+}
+function compareDate(inputDate) {
+  const date = new Date(inputDate);
+  const currentDate = new Date();
+  const inputDateWithoutTime = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const currentDateWithoutTime = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+  if (inputDateWithoutTime.toDateString() === currentDateWithoutTime.toDateString()) {
+      return 'present';
+  } else if (inputDateWithoutTime < currentDateWithoutTime) {
+      return 'past';
+  } else {
+      return 'future';
+  }
+}
+function setLocalStorage(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+function getLocalStorage(key) {
+  const value = localStorage.getItem(key);
+  return value ? JSON.parse(value) : null;
+}
 let taskList = JSON.parse(localStorage.getItem("tasks"));
 let nextId = JSON.parse(localStorage.getItem("nextId"));
 
-// Todo: create a function to generate a unique task id
-
-// Todo: create a function to create a task card
 function createTaskCard(task) {
     $( "#dialog-message" ).dialog({
         modal: true,
         buttons: {
           Add: function() {
+            handleAddTask()
             $( this ).dialog( "close" );
           }
         }
       });
-      $("#dialog-message").append('<input type="text" id="evententery"/>')
-   
+      $("#dialog-message").html('<input type="text" placeholder="Enter Task" id="event"><input type="text" id="datepicker" placeholder="Enter Date">')
 }
-
-// Todo: create a function to render the task list and make cards draggable
 function renderTaskList() {
-
+  if (tasks && tasks.length)
+tasks.forEach((t) => {
+  let timeframe =compareDate(t.taskDueDate)
+$("#todo-cards").append(`<div class="${timeframe} task-wrapper card card-body"><i class="fa fa-times-circle delete-button" aria-hidden="true"></i> ${t.taskName} - Duedate: ${t.taskDueDate}</div>`)
+})
 }
-
-// Todo: create a function to handle adding a new task
-function handleAddTask(event){
-
+function handleAddTask(){
+let event = $("#event").val()
+let datepicker = $("#datepicker").val()
+let timeframe =compareDate(datepicker)
+$("#todo-cards").append(`<div class="${timeframe} task-wrapper card card-body"><i class="fa fa-times-circle delete-button" aria-hidden="true"></i> ${event} - Duedate: ${datepicker}</div>`)
+$(".delete-button") .on("click", (e) => handleDeleteTask (e));
+tasks.push({taskName:event,taskDueDate:datepicker})
+setLocalStorage("my tasks",tasks)
 }
-
-// Todo: create a function to handle deleting a task
 function handleDeleteTask(event){
-
+console.log(event) 
+var parentElement = event.target.parentElement;
+var parentText = parentElement.textContent.trim();
+console.log(parentText)
+let parts = parentText.split ("-")
+let taskname = parts[0] .trim()
+removeTaskByName(taskname)
+console.log(taskname)
+event.target.parentElement.remove()
+setLocalStorage("my tasks",tasks)
 }
-
-// Todo: create a function to handle dropping a task into a new status lane
 function handleDrop(event, ui) {
-
 }
-
-// Todo: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
 $(document).ready(function () {
+  tasks = getLocalStorage("my tasks")
+  renderTaskList()
+  const today = dayjs();
+  let date=today.format('MMM D, YYYY')
+  console.log(date)
+  $('#todays-date').html(date);
+
+  $(".delete-button") .on("click", (e) => handleDeleteTask (e));
+
 $("#add-task") .on("click", function(){
    createTaskCard("task")
+   $( "#datepicker" ).datepicker();
+
 })
 });
