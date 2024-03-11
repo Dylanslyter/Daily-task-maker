@@ -1,90 +1,61 @@
-function taskCard(args) {
+let tasks = getLocalStorage("my tasks")
 
-  let str = `<div class="${timeframe} task-wrapper card card-body draggable" data-task-id="${taskId}">
-                        <i class="fa fa-times-circle delete-button" aria-hidden="true"></i> 
-                        <i class="fa fa-pencil edit-button" aria-hidden="true"></i> 
-                        ${args.event} - Duedate: ${args.date}
-                      </div>`;
-  $(".delete-button").on("click", function (e) {
-    const taskName = $(this).parent().text().trim().split('-')[0].trim();
-    removeTaskByName(taskName);
-    $(this).parent().remove();
+$(document).ready(function () {
+  const today = dayjs();
+  let date = today.format('MMM D, YYYY');
+  $('#todays-date').html(date);
+  list();
+
+  init()
+});
+
+function init() {
+  
+  $("#add-task").on("click", function () {
+  $("#dialog-message").dialog({
+    modal: true,
+    buttons: {
+      Add: function () {
+        add();
+        $(this).dialog("close");
+      }
+    }
   });
-  $(".draggable").draggable({
-    revert: "invalid",
-    stack: ".draggable",
-    helper: "clone",
-    zIndex: 1000,
-    cursor: "move"
+  $("#dialog-message").html('<input type="text" placeholder="Enter Task" id="event"><input type="text" id="datepicker" placeholder="Enter Date">');
+    $("#datepicker").datepicker();
   });
-  return str
+
+
+  $(".delete-button").on("click", (e) => remove(e));
+
+  
+  $(".edit-button").on("click", function (e) { 
+
+    $("#dialog-message").dialog({ modal: true, buttons: { Edit: () => { edit(); $(this).dialog("close");} }});
+    $("#dialog-message").html('<input type="text" placeholder="Enter Task" id="event"><input type="text" id="datepicker" placeholder="Enter Date">');
+    $("#datepicker").datepicker();
+  });
+
+  // draggable 
+  $(".draggable").draggable({ revert: "invalid", stack: ".draggable", helper: "clone", zIndex: 1000, cursor: "move" });
+
+  // droppable
+$(".droppable").droppable({
+  accept: ".draggable",
+  drop: function (event, ui) {
+    console.log("DROP", event, ui)
+    const taskId = ui.draggable.data('task-id');
+    const newCategory = $(this).closest('.lane').attr('id');
+    const task = tasks.find(task => task.taskId === taskId);
+    task.taskCategory = newCategory;
+    ui.draggable.detach().appendTo($(this));
+    ui.draggable.removeClass("to-do in-progress done").addClass(newCategory); 
+  }
+});
+
 }
 
-function handleEditTask() {
-  let event = $("#event").val();
-  let datepicker = $("#datepicker").val();
-  let timeframe = compareDate(datepicker);
-  const taskId = tasks.length + 1;
-  const newTask = { taskId, taskName: event, taskDueDate: datepicker, taskCategory: "to-do" };
-  tasks.push(newTask);
-  setLocalStorage("my tasks", tasks);
-  const laneSelector = "#todo-cards";
-  const taskCard = `<div class="${timeframe} task-wrapper card card-body draggable" data-task-id="${taskId}">
-                        <i class="fa fa-times-circle delete-button" aria-hidden="true"></i> 
-                        <i class="fa fa-pencil edit-button" aria-hidden="true"></i> 
-                        ${event} - Duedate: ${datepicker}
-                      </div>`;
-
-  $(laneSelector).append(taskCard);
-  $(".delete-button").on("click", function (e) {
-    const taskName = $(this).parent().text().trim().split('-')[0].trim();
-    removeTaskByName(taskName);
-    $(this).parent().remove();
-  });
-  $(".draggable").draggable({
-    revert: "invalid",
-    stack: ".draggable",
-    helper: "clone",
-    zIndex: 1000,
-    cursor: "move"
-  });
-}
-
-function handleAddTask() {
-  let event = $("#event").val();
-  let datepicker = $("#datepicker").val();
-  let timeframe = compareDate(datepicker);
-  const taskId = tasks.length + 1;
-  const newTask = { taskId, taskName: event, taskDueDate: datepicker, taskCategory: "to-do" };
-  tasks.push(newTask);
-  setLocalStorage("my tasks", tasks);
-  const laneSelector = "#todo-cards";
-  const taskCard = `<div class="${timeframe} task-wrapper card card-body draggable" data-task-id="${taskId}">
-                        <i class="fa fa-times-circle delete-button" aria-hidden="true"></i> 
-                        <i class="fa fa-pencil edit-button" aria-hidden="true"></i> 
-                        ${event} - Duedate: ${datepicker}
-                      </div>`;
-  $(laneSelector).append(taskCard);
-  $(".delete-button").on("click", function (e) {
-    const taskName = $(this).parent().text().trim().split('-')[0].trim();
-    removeTaskByName(taskName);
-    $(this).parent().remove();
-  });
-  $(".edit-button").on("click", function (e) {
-    const taskName = $(this).parent().text().trim().split('-')[0].trim();
-    removeTaskByName(taskName);
-    $(this).parent().remove();
-  });
-  $(".draggable").draggable({
-    revert: "invalid",
-    stack: ".draggable",
-    helper: "clone",
-    zIndex: 1000,
-    cursor: "move"
-  });
-}
-
-function renderTaskList() {
+function list() {
   const lanes = {
     "to-do": "#todo-cards",
     "in-progress": "#in-progress-cards",
@@ -96,35 +67,80 @@ function renderTaskList() {
     const laneSelector = lanes[laneId];
     const timeframe = compareDate(task.taskDueDate);
     const taskCard = `<div class="${timeframe} task-wrapper card card-body draggable" data-task-id="${task.taskId}">
-                                    <i class="fa fa-times-circle delete-button" aria-hidden="true"></i> 
-                                    <i class="fa fa-pencil edit-button" aria-hidden="true"></i> 
+                                    <i class="fa fa-times-circle mr-2 delete-button" aria-hidden="true"></i> 
+                                    <i class="fa fa-edit edit-button" aria-hidden="true"></i>
+
                                     ${task.taskName} - Duedate: ${task.taskDueDate}
                                   </div>`;
     $(laneSelector).append(taskCard);
   });
 
-  $(".delete-button").on("click", function (e) {
-    const taskName = $(this).parent().text().trim().split('-')[0].trim();
-    removeTaskByName(taskName);
-    $(this).parent().remove();
-  });
-  $(".edit-button").on("click", function (e) {
-    const taskName = $(this).parent().text().trim().split('-')[0].trim();
-    removeTaskByName(taskName);
-    $(this).parent().remove();
-  });
 }
 
+function remove(e) {
 
+  const taskName = $(e.target).parent().text().trim().split('-')[0].trim();
 
-function removeTaskByName(taskName) {
   const index = tasks.findIndex(task => task.taskName === taskName);
   if (index !== -1) {
     tasks.splice(index, 1);
     console.log(`Task ${taskName} removed successfully.`);
+    $(e.target).parent().remove();
   } else {
     console.log(`Task ${taskName} not found.`);
   }
+  setLocalStorage("my tasks",tasks)
+}
+
+function edit() {
+  let event = $("#event").val();
+  let datepicker = $("#datepicker").val();
+  let timeframe = compareDate(datepicker);
+  const taskId = tasks.length + 1;
+  const newTask = { taskId: taskId, taskName: event, taskDueDate: datepicker, taskCategory: "to-do" };
+
+  const index = tasks.findIndex(task => task.taskName === event);
+
+  if (index !== -1) {
+    tasks.splice(index, 1);
+    setLocalStorage("my tasks",tasks)
+    console.log(`Task ${taskName} edited successfully.`);
+    $(e.target).parent().remove();
+  } else {
+    console.log(`Task ${taskName} not found.`);
+  }
+
+  init()
+
+}
+
+function add() {
+  let event = $("#event").val();
+  let datepicker = $("#datepicker").val();
+  let timeframe = compareDate(datepicker);
+  const taskId = tasks.length + 1;
+  const newTask = { taskId: taskId, taskName: event, taskDueDate: datepicker, taskCategory: "to-do" };
+  tasks.push(newTask);
+  setLocalStorage("my tasks", tasks);
+  const laneSelector = "#todo-cards"; 
+  const taskCard = `<div class="${timeframe} task-wrapper card card-body draggable" data-task-id="${taskId}">
+                        <i class="fa fa-times-circle delete-button mr-2" aria-hidden="true"></i> 
+                        <i class="fa fa-edit edit-button" aria-hidden="true"></i>
+
+                        ${event} - Duedate: ${datepicker}
+                      </div>`;
+  $(laneSelector).append(taskCard);
+
+  init()
+}
+
+function setLocalStorage(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getLocalStorage(key) {
+  const value = localStorage.getItem(key);
+  return value ? JSON.parse(value) : null;
 }
 
 function compareDate(inputDate) {
@@ -140,80 +156,3 @@ function compareDate(inputDate) {
     return 'future';
   }
 }
-
-function setLocalStorage(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
-
-function getLocalStorage(key) {
-  const value = localStorage.getItem(key);
-  return value ? JSON.parse(value) : null;
-}
-
-function createTaskCard(task) {
-  $("#dialog-message").dialog({
-    modal: true,
-    buttons: {
-      Add: function () {
-        handleAddTask();
-        $(this).dialog("close");
-      }
-    }
-  });
-  $("#dialog-message").html('<input type="text" placeholder="Enter Task" id="event"><input type="text" id="datepicker" placeholder="Enter Date">');
-}
-
-function editTaskCard() {
-  $("#dialog-message").dialog({
-    modal: true,
-    buttons: {
-      Add: function () {
-        handleEditTask();
-        $(this).dialog("close");
-      }
-    }
-  });
-  $("#dialog-message").html('<input type="text" placeholder="Enter Task" id="event"><input type="text" id="datepicker" placeholder="Enter Date">');
-}
-
-$(document).ready(function () {
-  tasks = getLocalStorage("my tasks")
-  renderTaskList();
-
-  const today = dayjs();
-  let date = today.format('MMM D, YYYY');
-  $('#todays-date').html(date);
-
-  $(".delete-button").on("click", (e) => handleDeleteTask(e));
-
-  $("#add-task").on("click", function () {
-    createTaskCard("task");
-    $("#datepicker").datepicker();
-  });
-
-  $(".edit-button").on("click", function () {
-    editTaskCard("task");
-    $("#datepicker").datepicker();
-
-  });
-
-  $(".draggable").draggable({
-    revert: "invalid",
-    stack: ".draggable",
-    helper: "clone",
-    zIndex: 1000,
-    cursor: "move"
-  });
-
-  $(".droppable").droppable({
-    accept: ".draggable",
-    drop: function (event, ui) {
-      const taskId = ui.draggable.data('task-id');
-      const newCategory = $(this).closest('.lane').attr('id');
-      const task = tasks.find(task => task.taskId === taskId);
-      task.taskCategory = newCategory;
-      ui.draggable.detach().appendTo($(this));
-
-    }
-  });
-});
