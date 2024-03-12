@@ -13,7 +13,7 @@ clicking add task i can create different tasks for different days
 
 Adding screen shot here:
 
-
+![Screenshot](assets/screenshot1.png)
 
 
 

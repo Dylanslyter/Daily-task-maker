@@ -76,18 +76,16 @@ function list() {
 }
 
 function remove(e) {
-
-  const taskName = $(e.target).parent().text().trim().split('-')[0].trim();
-
-  const index = tasks.findIndex(task => task.taskName === taskName);
+  const taskId = $(e.target).closest('.task-wrapper').data('task-id');
+  const index = tasks.findIndex(task => task.taskId === taskId);
   if (index !== -1) {
-    tasks.splice(index, 1);
-    console.log(`Task ${taskName} removed successfully.`);
-    $(e.target).parent().remove();
+    const removedTask = tasks.splice(index, 1)[0];
+    console.log(`Task "${removedTask.taskName}" removed successfully.`);
+    $(e.target).closest('.task-wrapper').remove();
   } else {
-    console.log(`Task ${taskName} not found.`);
+    console.log(`Task with ID "${taskId}" not found.`);
   }
-  setLocalStorage("my tasks",tasks)
+  setLocalStorage("my tasks", tasks)
 }
 
 function edit() {
