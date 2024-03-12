@@ -36,10 +36,8 @@ function init() {
     $("#datepicker").datepicker();
   });
 
-  // draggable 
   $(".draggable").draggable({ revert: "invalid", stack: ".draggable", helper: "clone", zIndex: 1000, cursor: "move" });
 
-  // droppable
 $(".droppable").droppable({
   accept: ".draggable",
   drop: function (event, ui) {
@@ -67,11 +65,10 @@ function list() {
     const laneSelector = lanes[laneId];
     const timeframe = compareDate(task.taskDueDate);
     const taskCard = `<div class="${timeframe} task-wrapper card card-body draggable" data-task-id="${task.taskId}">
-                                    <i class="fa fa-times-circle mr-2 delete-button" aria-hidden="true"></i> 
-                                    <i class="fa fa-edit edit-button" aria-hidden="true"></i>
-
-                                    ${task.taskName} - Duedate: ${task.taskDueDate}
-                                  </div>`;
+       <i class="fa fa-times-circle mr-2 delete-button" aria-hidden="true"></i> 
+       <i class="fa fa-edit edit-button" aria-hidden="true"></i>
+       ${task.taskName} - Duedate: ${task.taskDueDate}
+       </div>`;
     $(laneSelector).append(taskCard);
   });
 
@@ -124,11 +121,10 @@ function add() {
   setLocalStorage("my tasks", tasks);
   const laneSelector = "#todo-cards"; 
   const taskCard = `<div class="${timeframe} task-wrapper card card-body draggable" data-task-id="${taskId}">
-                        <i class="fa fa-times-circle delete-button mr-2" aria-hidden="true"></i> 
-                        <i class="fa fa-edit edit-button" aria-hidden="true"></i>
-
-                        ${event} - Duedate: ${datepicker}
-                      </div>`;
+     <i class="fa fa-times-circle delete-button mr-2" aria-hidden="true"></i> 
+     <i class="fa fa-edit edit-button" aria-hidden="true"></i>
+     ${event} - Duedate: ${datepicker}
+     </div>`;
   $(laneSelector).append(taskCard);
 
   init()
