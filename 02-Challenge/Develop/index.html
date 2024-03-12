@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-  
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
@@ -11,7 +10,6 @@
     integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
   <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
-
   <link rel="stylesheet" href="./assets/css/style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>Task Board</title>
@@ -22,14 +20,13 @@
   <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.3/dayjs.min.js"
     integrity="sha256-iu/zLUB+QgISXBLCW/mcDi/rnf4m4uEDO0wauy76x7U=" crossorigin="anonymous"></script>
-
   <script src="./assets/js/script.js"></script>
 </head>
 
 <body>
   <header class="p-4 mb-4 text-center border-bottom border-5">
     <h1 class="display-3">Task Board</h1>
-  <span id="todays-date"></span>
+    <span id="todays-date"></span>
     <p class="lead">Schedule for the week</p>
   </header>
   <div class="container">
@@ -38,40 +35,38 @@
     </div>
     <div class="row swim-lanes text-center justify-content-between">
       <div class="col-12 col-lg-4 d-flex">
-        <div id="to-do" class="card border-light mb-3 lane flex-grow-1">
+        <div id="to-do" class="card border-light mb-3 lane droppable">
           <div class="card-header bg-white">
             <h2 class="card-title mb-1">To Do</h2>
           </div>
-          <div class="card-body bg-light">
-            <div id="todo-cards"></div>
+          <div class="card-body bg-light droppable-content" id="todo-cards">
+         
           </div>
         </div>
       </div>
       <div class="col-12 col-lg-4 d-flex">
-        <div id="in-progress" class="card border-light mb-3 lane flex-grow-1">
+        <div id="in-progress" class="card border-light mb-3 lane droppable">
           <div class="card-header bg-white">
             <h2 class="card-title mb-1">In Progress</h2>
           </div>
-          <div class="card-body bg-light">
-            <div id="in-progress-cards"></div>
+          <div class="card-body bg-light droppable-content" id="in-progress-cards">
+        
           </div>
         </div>
+      </div>
+      <div class="col-12 col-lg-4 d-flex">
+        <div id="done" class="card border-light mb-3 lane droppable">
+          <div class="card-header bg-white">
+            <h2 class="card-title mb-1">Done</h2>
+          </div>
+          <div class="card-body bg-light droppable-content" id="done-cards">
+            
+          </div>
         </div>
-        <div class="col-12 col-lg-4 d-flex">
-          <div id="done" class="card border-light mb-3 lane flex-grow-1">
-            <div class="card-header bg-white">
-              <h2 class="card-title mb-1">Done</h2>
-            </div>
-            <div class="card-body bg-light">
-              <div id="done-cards"></div>
-          </div>
-          </div>
       </div>
     </div>
   </div>
-  <div id="dialog-message" title="Task Entry">
-    </div>
-  
+  <div id="dialog-message" title="Task Entry"></div>
 </body>
 
 </html>

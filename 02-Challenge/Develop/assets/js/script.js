@@ -38,18 +38,19 @@ function init() {
 
   $(".draggable").draggable({ revert: "invalid", stack: ".draggable", helper: "clone", zIndex: 1000, cursor: "move" });
 
-$(".droppable").droppable({
-  accept: ".draggable",
-  drop: function (event, ui) {
-    console.log("DROP", event, ui)
-    const taskId = ui.draggable.data('task-id');
-    const newCategory = $(this).closest('.lane').attr('id');
-    const task = tasks.find(task => task.taskId === taskId);
-    task.taskCategory = newCategory;
-    ui.draggable.detach().appendTo($(this));
-    ui.draggable.removeClass("to-do in-progress done").addClass(newCategory); 
-  }
-});
+  $(".droppable").droppable({
+    accept: ".draggable",
+    drop: function(event, ui) {
+      const taskId = ui.draggable.data("task-id");
+      const newCategory = $(this).closest(".lane").attr("id");
+      const task = tasks.find(task => task.taskId === taskId);
+      task.taskCategory = newCategory;
+      ui.draggable.detach().appendTo($(this));
+      ui.draggable.removeClass("to-do in-progress done").addClass(newCategory);
+    
+      setLocalStorage("my tasks", tasks);
+    }
+  });
 
 }
 
